@@ -22,3 +22,16 @@ jobs:
 
       - name: Build and test
         run: mvn clean verify
+      
+      - name: SonarCloud analysis
+        run: |
+          mvn sonar:sonar \
+            -Dsonar.projectKey=Pratap4004_ecommerce-microservices \
+            -Dsonar.organization=pratap4004 \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+
+
+          
+            
+
