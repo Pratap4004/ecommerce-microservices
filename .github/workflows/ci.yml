@@ -1,6 +1,5 @@
 name: Java CI
 
-
 on:
   pull_request:
     branches:
@@ -10,19 +9,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-
     steps:
 
       - name: Checkout source code
         uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-          chache: maven
+          cache: maven
 
       - name: Build and test
         run: mvn clean verify
-      
+
       - name: SonarCloud analysis
         run: |
           mvn sonar:sonar \
@@ -30,8 +31,4 @@ jobs:
             -Dsonar.organization=pratap4004 \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
-
-
-          
-            
 
