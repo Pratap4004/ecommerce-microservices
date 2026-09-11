@@ -1,0 +1,82 @@
+name: Build and Push Images to GAR
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  PROJECT_ID: project-e4b58c33-b31e-44d9-a36
+  GAR_LOCATION: asia-south1
+  GAR_REPOSITORY: ecommerce-microservices
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build all microservices
+        run: mvn clean package -DskipTests
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          workload_identity_provider: projects/142823644639/locations/global/workloadIdentityPools/github-actions-ecomm/providers/github
+          service_account: github-actions@project-e4b58c33-b31e-44d9-a36.iam.gserviceaccount.com
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Configure Docker for GAR
+        run: |
+          gcloud auth configure-docker ${{ env.GAR_LOCATION }}-docker.pkg.dev --quiet
+
+      - name: Build and push Docker images
+        run: |
+
+          services=(
+            customer
+            product
+            order
+            payment
+            notification
+            eureka-server
+            gateway
+          )
+
+          for service in "${services[@]}"; do
+
+            IMAGE="${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${service}:${{ github.sha }}"
+
+            echo "========================================="
+            echo "Building ${service}"
+            echo "========================================="
+
+            docker build \
+              --build-arg SERVICE=${service} \
+              -t "${IMAGE}" \
+              .
+
+            echo "Pushing ${service}"
+
+            docker push "${IMAGE}"
+
+          done
