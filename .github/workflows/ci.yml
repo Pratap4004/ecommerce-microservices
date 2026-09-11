@@ -32,4 +32,5 @@ jobs:
             -Dsonar.projectKey=Pratap4004_ecommerce-microservices \
             -Dsonar.organization=pratap4004 \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.qualitygate.wait=true
