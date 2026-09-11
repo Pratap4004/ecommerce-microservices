@@ -15,6 +15,9 @@ jobs:
 
       - name: Checkout source code
         uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4 
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -25,9 +28,8 @@ jobs:
       
       - name: SonarCloud analysis
         run: |
-          mvn sonar:sonar \
+          mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
             -Dsonar.projectKey=Pratap4004_ecommerce-microservices \
             -Dsonar.organization=pratap4004 \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.token=${{ secrets.SONAR_TOKEN }}  
-
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
