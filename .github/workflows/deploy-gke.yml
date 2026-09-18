@@ -52,14 +52,20 @@ jobs:
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
 
-      # 6. Configure Docker to use Artifact Registry
+      # 6. Install GKE authentication plugin
+      - name: Install GKE Auth Plugin
+        run: |
+          gcloud components install gke-gcloud-auth-plugin --quiet
+          gke-gcloud-auth-plugin --version
+
+      # 7. Configure Docker to use Artifact Registry
       - name: Configure Docker for GAR
         run: |
           gcloud auth configure-docker \
             ${{ env.GAR_LOCATION }}-docker.pkg.dev \
             --quiet
 
-      # 7. Build and push all Docker images
+      # 8. Build and push all Docker images
       - name: Build and Push Docker Images
         run: |
           services=(
@@ -91,7 +97,7 @@ jobs:
 
           done
 
-      # 8. Get GKE credentials
+      # 9. Get GKE credentials
       - name: Get GKE credentials
         run: |
           gcloud container clusters get-credentials \
@@ -99,13 +105,13 @@ jobs:
             --region "${GKE_REGION}" \
             --project "${PROJECT_ID}"
 
-      # 9. Deploy Kubernetes resources
+      # 10. Deploy Kubernetes resources
       - name: Deploy to GKE
         run: |
           kubectl apply -f k8s/gke/
 
-      # 10. Restart application deployments
-      # This is required because we are using :latest.
+      # 11. Restart application deployments
+      # Required because we are using :latest.
       - name: Restart application deployments
         run: |
           kubectl rollout restart deployment \
@@ -118,7 +124,7 @@ jobs:
             gateway \
             -n ecommerce
 
-      # 11. Wait for deployments to become ready
+      # 12. Wait for deployments to become ready
       - name: Check rollout status
         run: |
           kubectl rollout status deployment/customer -n ecommerce --timeout=5m
