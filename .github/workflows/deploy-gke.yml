@@ -1,4 +1,5 @@
 name: Build, Push and Deploy to GKE
+# Builds current source, pushes latest images to GAR, and deploys them to GKE
 
 on:
   push:
