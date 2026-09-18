@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: eureka-server
-          image: asia-south1-docker.pkg.dev/project-e4b58c33-b31e-44d9-a36/ecommerce-microservices/eureka-server:ceff193e909e8a2cd5d4ec476308580b31d30451
+          image: asia-south1-docker.pkg.dev/project-e4b58c33-b31e-44d9-a36/ecommerce-microservices/eureka-server:5f973ac262e20fec967c67c4da6855c84eb2055d
           imagePullPolicy: IfNotPresent
 
           ports:
