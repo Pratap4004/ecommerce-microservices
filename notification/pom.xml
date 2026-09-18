@@ -11,11 +11,6 @@
     <packaging>jar</packaging>
     <artifactId>notification</artifactId>
 
-    <properties>
-        <app.env.var1/>
-        <app.env.var2/>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -59,11 +54,6 @@
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
             <version>1.9.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk</artifactId>
-            <version>1.12.276</version>
         </dependency>
         <dependency>
             <groupId>dev.nano</groupId>
@@ -170,12 +160,6 @@
                                     <tag>latest</tag>
                                 </tags>
                             </to>
-                            <container>
-                                <environment>
-                                    <ACCESS_KEY_BUCKET>${app.env.var1}</ACCESS_KEY_BUCKET>
-                                    <SECRET_KEY_BUCKET>${app.env.var2}</SECRET_KEY_BUCKET>
-                                </environment>
-                            </container>
                         </configuration>
                         <executions>
                             <execution>

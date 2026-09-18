@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: notification
+  namespace: ecommerce
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: notification
+
+  template:
+    metadata:
+      labels:
+        app: notification
+
+    spec:
+      containers:
+        - name: notification
+
+          image: asia-south1-docker.pkg.dev/project-e4b58c33-b31e-44d9-a36/ecommerce-microservices/notification:9f1721ffdabd4d724cbac19c0976771e6832dc59
+
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 8004
+
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: kube
+
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres:5432/notification
+
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: password
+
+            - name: SPRING_RABBITMQ_ADDRESSES
+              value: rabbitmq:5672
+
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: http://eureka-server:8761/eureka
+
+            - name: SPRING_ZIPKIN_BASE_URL
+              value: http://zipkin:9411
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
