@@ -21,9 +21,9 @@ spec:
       containers:
         - name: payment
 
-          image: asia-south1-docker.pkg.dev/project-e4b58c33-b31e-44d9-a36/ecommerce-microservices/payment:5f973ac262e20fec967c67c4da6855c84eb2055d
+          image: asia-south1-docker.pkg.dev/project-e4b58c33-b31e-44d9-a36/ecommerce-microservices/payment:latest
 
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
 
           ports:
             - containerPort: 8005

@@ -1,0 +1,130 @@
+name: Build, Push and Deploy to GKE
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  PROJECT_ID: project-e4b58c33-b31e-44d9-a36
+  GAR_LOCATION: asia-south1
+  GAR_REPOSITORY: ecommerce-microservices
+  GKE_CLUSTER: ecommerce-gke
+  GKE_REGION: asia-south1
+
+jobs:
+  build-push-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # 1. Checkout source code
+      - name: Checkout source code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      # 2. Set up Java 17
+      - name: Set up Java
+        uses: actions/setup-java@cf277c60eb25467037889841ebdb72551f06f6c3 # v4.9.1
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      # 3. Build Java application
+      - name: Build all microservices
+        run: mvn clean package -DskipTests
+
+      # 4. Authenticate to Google Cloud using Workload Identity Federation
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          workload_identity_provider: projects/142823644639/locations/global/workloadIdentityPools/github-actions-ecomm/providers/github
+          service_account: github-actions@project-e4b58c33-b31e-44d9-a36.iam.gserviceaccount.com
+
+      # 5. Install Google Cloud SDK
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+
+      # 6. Configure Docker to use Artifact Registry
+      - name: Configure Docker for GAR
+        run: |
+          gcloud auth configure-docker \
+            ${{ env.GAR_LOCATION }}-docker.pkg.dev \
+            --quiet
+
+      # 7. Build and push all Docker images
+      - name: Build and Push Docker Images
+        run: |
+          services=(
+            customer
+            product
+            order
+            payment
+            notification
+            eureka-server
+            gateway
+          )
+
+          for service in "${services[@]}"; do
+
+            IMAGE="${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${service}:latest"
+
+            echo "========================================="
+            echo "Building ${service}"
+            echo "========================================="
+
+            docker build \
+              --build-arg SERVICE=${service} \
+              -t "${IMAGE}" \
+              .
+
+            echo "Pushing ${service}"
+
+            docker push "${IMAGE}"
+
+          done
+
+      # 8. Get GKE credentials
+      - name: Get GKE credentials
+        run: |
+          gcloud container clusters get-credentials \
+            "${GKE_CLUSTER}" \
+            --region "${GKE_REGION}" \
+            --project "${PROJECT_ID}"
+
+      # 9. Deploy Kubernetes resources
+      - name: Deploy to GKE
+        run: |
+          kubectl apply -f k8s/gke/
+
+      # 10. Restart application deployments
+      # This is required because we are using :latest.
+      - name: Restart application deployments
+        run: |
+          kubectl rollout restart deployment \
+            customer \
+            product \
+            order \
+            payment \
+            notification \
+            eureka-server \
+            gateway \
+            -n ecommerce
+
+      # 11. Wait for deployments to become ready
+      - name: Check rollout status
+        run: |
+          kubectl rollout status deployment/customer -n ecommerce --timeout=5m
+          kubectl rollout status deployment/product -n ecommerce --timeout=5m
+          kubectl rollout status deployment/order -n ecommerce --timeout=5m
+          kubectl rollout status deployment/payment -n ecommerce --timeout=5m
+          kubectl rollout status deployment/notification -n ecommerce --timeout=5m
+          kubectl rollout status deployment/eureka-server -n ecommerce --timeout=5m
+          kubectl rollout status deployment/gateway -n ecommerce --timeout=5m
