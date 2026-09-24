@@ -3,6 +3,8 @@ kind: Ingress
 metadata:
   name: ecommerce-ingress
   namespace: ecommerce
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: ecommerce-ingress-ip
 spec:
   rules:
     - http:
