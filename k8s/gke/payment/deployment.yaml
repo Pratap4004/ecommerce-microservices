@@ -21,9 +21,9 @@ spec:
       containers:
         - name: payment
 
-          image: asia-south1-docker.pkg.dev/project-e4b58c33-b31e-44d9-a36/ecommerce-microservices/payment:9f1721ffdabd4d724cbac19c0976771e6832dc59
+          image: asia-south1-docker.pkg.dev/project-e4b58c33-b31e-44d9-a36/ecommerce-microservices/payment:latest
 
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
 
           ports:
             - containerPort: 8005
@@ -44,8 +44,6 @@ spec:
             - name: SPRING_RABBITMQ_ADDRESSES
               value: rabbitmq:5672
 
-            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
-              value: http://eureka-server:8761/eureka
 
           resources:
             requests:

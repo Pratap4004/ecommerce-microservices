@@ -23,7 +23,7 @@ public class CustomerController {
 
     @GetMapping(
             path = "/{customerId}",
-            produces={MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
+            produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<CustomerDTO> getCustomer(@PathVariable("customerId") Long customerId)
             throws CustomerNotFoundException {

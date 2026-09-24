@@ -21,9 +21,9 @@ spec:
       containers:
         - name: customer
 
-          image: asia-south1-docker.pkg.dev/project-e4b58c33-b31e-44d9-a36/ecommerce-microservices/customer:4d5cb28132741bf5b9b0254ba29a5cebfecf36a1
+          image: asia-south1-docker.pkg.dev/project-e4b58c33-b31e-44d9-a36/ecommerce-microservices/customer:latest
 
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
 
           ports:
             - containerPort: 8001
@@ -47,8 +47,6 @@ spec:
             - name: SPRING_ZIPKIN_BASE_URL
               value: http://zipkin:9411
 
-            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
-              value: http://eureka-server:8761/eureka
 
           resources:
             requests:

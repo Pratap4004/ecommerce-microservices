@@ -26,35 +26,26 @@ spring:
       routes:
 
         - id: customer
-          uri: lb://CUSTOMER
+          uri: http://customer
           predicates:
             - Path=/customer/api/v1/customers/**
 
         - id: product
-          uri: lb://PRODUCT
+          uri: http://product
           predicates:
             - Path=/product/api/v1/products/**
 
         - id: order
-          uri: lb://ORDER
+          uri: http://order
           predicates:
             - Path=/order/api/v1/orders/**
 
         - id: payment
-          uri: lb://PAYMENT
+          uri: http://payment
           predicates:
             - Path=/payment/api/v1/payments/**
 
         - id: notification
-          uri: lb://NOTIFICATION
+          uri: http://notification
           predicates:
             - Path=/notification/api/v1/notifications/**
-
-# Eureka Client
-eureka:
-  client:
-    service-url:
-      defaultZone: http://eureka-server:8761/eureka
-
-    fetch-registry: true
-    register-with-eureka: true
