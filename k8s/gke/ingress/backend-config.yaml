@@ -1,0 +1,10 @@
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: gateway-backend-config
+  namespace: ecommerce
+spec:
+  healthCheck:
+    requestPath: /health
+    port: 8006
+    type: HTTP
