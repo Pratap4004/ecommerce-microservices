@@ -75,7 +75,6 @@ jobs:
             order
             payment
             notification
-            eureka-server
             gateway
           )
 
@@ -121,7 +120,6 @@ jobs:
             order \
             payment \
             notification \
-            eureka-server \
             gateway \
             -n ecommerce
 
@@ -133,5 +131,4 @@ jobs:
           kubectl rollout status deployment/order -n ecommerce --timeout=5m
           kubectl rollout status deployment/payment -n ecommerce --timeout=5m
           kubectl rollout status deployment/notification -n ecommerce --timeout=5m
-          kubectl rollout status deployment/eureka-server -n ecommerce --timeout=5m
           kubectl rollout status deployment/gateway -n ecommerce --timeout=5m
